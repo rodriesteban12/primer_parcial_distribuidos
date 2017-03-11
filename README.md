@@ -84,6 +84,7 @@ Podemos apreciar como se define el nombre de la base de datos en cada caso (para
 
 ##Cookbooks
 Aqui podemos apreciar los cookbooks necesarios para el aprovisionamiento de las máquinas con base en la arquitectura propuesta.
+
 ![Cookbooks parcial](images/cookbooks.png)
 ###Balancer
 ![Balancer-tree](images/tree-balancer.png)
