@@ -1,0 +1,22 @@
+<HTML>
+	<HEAD>
+	<TITLE>Servidor <%=@idserver%></TITLE>
+	</HEAD>
+<BODY>
+<H1>Servidor <%=@idserver%></H1>
+
+<?php
+$con = mysql_connect("<%=@ipdb%>","<%=@usuario%>","<%=@pass%>");
+if (!$con)
+  {
+  die('Could not connect: ' . mysql_error());
+  }
+mysql_select_db("database1", $con);
+$result = mysql_query("SELECT * FROM example");
+while($row = mysql_fetch_array($result))
+  {
+  echo $row['name'] . " " . $row['age'];
+  echo "<br />";
+  }
+mysql_close($con);
+?>
