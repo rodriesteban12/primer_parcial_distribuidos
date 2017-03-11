@@ -1,4 +1,4 @@
-# Primer parcial Distribuidos
+# Primer Parcial Distribuidos
 ## Rodrigo Rivera
 
 
