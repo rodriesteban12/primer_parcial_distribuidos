@@ -5,7 +5,9 @@
 ### Paso a paso:
 
 ![Server 1 Image](images/server1.png)
-
+#Aprovisionamiento de máquinas virtuales
+Para lograr hacer el aprovisionamiento se debe crear un vagrant file junto con unos cookbooks que representan cada servicio que hace parte de la arquitectura (balanceador de cargas, web, base de datos).
+Lo primero que debemos hacer es el vagrant file para aprovisionar cada una de las máquinas como podemos ver a continuación.
 ##Vagrant file
 
 ```ruby
@@ -77,3 +79,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 end
 ```
+
+Podemos apreciar como se define el nombre de la base de datos en cada caso (para base de datos db= centos_db) en la cual se crea una máquina con el box Centos64Updated y se especifica la dirección ip de la máquina junto con la dirección e interfaz con la cual se hará puente para poder tener salida a la red del laboratorio (pool de direcciones asignada en clase) y se costumiza con cada parámetro (recursos de la máquina) necesario. Luego se especifica en cada segmento la herramienta de aprovisionamiento que se usará, en este caso, chef, además de la ruta en la cual se encuentra el cookbook respectivo para dicha máquina junto con las carpetas básicas (attributes, files, recipes, templates) y receta para que se implente el servicio deseado.
+
+##Cookbooks
+![Cookbooks parcial](images/cookbooks.png)
+Aqui podemos apreciar los cookbooks necesarios para el aprovisionamiento de las máquinas con base en la arquitectura propuesta.
+###Balancer
+![Balancer-tree](images/balancer-tree.png)
+####default.rb
+```
+default[:balancer][:maqa]='192.168.131.82'
+default[:balancer][:maqb]='192.168.131.83'
+```
+
+![Web-tree](images/web-tree.png)
+![Db-tree](images/db-tree.png)
+
