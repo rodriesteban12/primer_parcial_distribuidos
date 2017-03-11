@@ -4,7 +4,7 @@
 
 ### Paso a paso:
 
-![Server 1 Image](images/server1.png)
+
 #Aprovisionamiento de máquinas virtuales
 Para lograr hacer el aprovisionamiento se debe crear un vagrant file junto con unos cookbooks que representan cada servicio que hace parte de la arquitectura (balanceador de cargas, web, base de datos).
 Lo primero que debemos hacer es el vagrant file para aprovisionar cada una de las máquinas como podemos ver a continuación.
@@ -86,13 +86,69 @@ Podemos apreciar como se define el nombre de la base de datos en cada caso (para
 ![Cookbooks parcial](images/cookbooks.png)
 Aqui podemos apreciar los cookbooks necesarios para el aprovisionamiento de las máquinas con base en la arquitectura propuesta.
 ###Balancer
-![Balancer-tree](images/balancer-tree.png)
+![Balancer-tree](images/tree-balancer.png)
 ####default.rb
 ```
 default[:balancer][:maqa]='192.168.131.82'
 default[:balancer][:maqb]='192.168.131.83'
 ```
+####nginx.repo
+```
+[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
+gpgcheck=0
+enabled=1
+```
+####installbalancer.rb
+```ruby
+bash 'open port' do
+   code <<-EOH
+   iptables -I INPUT 5 -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
+   iptables -I INPUT 5 -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+   service iptables save
+   EOH
+end
 
+cookbook_file '/etc/yum.repos.d/nginx.repo' do
+   source 'nginx.repo'
+   mode 0777
+end
+
+package 'nginx'
+
+template '/etc/nginx/nginx.conf' do
+   source 'nginx.conf.erb'
+   mode 0777
+   variables(
+      maqa: node[:balancer][:maqa],
+      maqb: node[:balancer][:maqb]
+   )
+end
+
+service 'nginx' do
+   action [:enable, :start]
+end
+```
+####nginx.conf.erb
+```ruby
+worker_processes  1;
+events {
+   worker_connections 1024;
+}
+http {
+    upstream servers {
+         server <%=@maqa%>;
+         server <%=@maqb%>;
+    }
+    server {
+        listen 8080;
+        location / {
+              proxy_pass http://servers;
+        }
+    }
+}
+```
 ![Web-tree](images/web-tree.png)
 ![Db-tree](images/db-tree.png)
 
